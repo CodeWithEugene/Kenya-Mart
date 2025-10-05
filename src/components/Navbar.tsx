@@ -38,7 +38,47 @@ export const Navbar = () => {
       }
     });
 
-    return () => subscription.unsubscribe();
+    // Listen for in-app cart updates (same-tab)
+    const handleCartUpdated = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session?.user) {
+        fetchCartCount(session.user.id);
+      }
+    };
+    window.addEventListener("cart-updated", handleCartUpdated);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener("cart-updated", handleCartUpdated);
+    };
+  }, []);
+
+  // Subscribe to realtime DB changes (cross-tab/device)
+  useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session?.user) return;
+      channel = supabase
+        .channel("cart-items-changes")
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "cart_items",
+            filter: `user_id=eq.${session.user.id}`,
+          },
+          () => fetchCartCount(session.user.id)
+        )
+        .subscribe();
+    });
+
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchCartCount = async (userId: string) => {
