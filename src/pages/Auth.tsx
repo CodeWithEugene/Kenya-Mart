@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Footer } from "@/components/Footer";
 
 const authSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -196,6 +197,7 @@ const Auth = () => {
           </Tabs>
         </CardContent>
       </Card>
+      <Footer />
     </div>
   );
 };

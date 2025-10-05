@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CheckCircle, Package } from "lucide-react";
+import { Footer } from "@/components/Footer";
 
 interface Order {
   id: string;
@@ -130,6 +131,7 @@ const OrderConfirmation = () => {
           </div>
         </Card>
       </main>
+      <Footer />
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
+import { Footer } from "@/components/Footer";
 
 interface CartItem {
   id: string;
@@ -256,6 +257,7 @@ const Cart = () => {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 };

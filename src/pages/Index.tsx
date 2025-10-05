@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Zap, Shield, Truck } from "lucide-react";
@@ -156,17 +157,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-secondary text-secondary-foreground py-8 border-t-4 border-foreground">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-2xl font-black mb-2">
-            Kenya<span className="text-primary">Mart</span>
-          </p>
-          <p className="text-sm opacity-80">
-            © 2025 KenyaMart. All rights reserved. Built with Lovable.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

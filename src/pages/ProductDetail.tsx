@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, ArrowLeft, Package } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Footer } from "@/components/Footer";
 
 interface Product {
   id: string;
@@ -262,6 +263,7 @@ const ProductDetail = () => {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 };

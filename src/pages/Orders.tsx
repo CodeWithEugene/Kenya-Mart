@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Package } from "lucide-react";
+import { Footer } from "@/components/Footer";
 
 interface Order {
   id: string;
@@ -134,6 +135,7 @@ const Orders = () => {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 };

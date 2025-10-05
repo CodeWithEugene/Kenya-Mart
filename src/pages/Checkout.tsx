@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { Footer } from "@/components/Footer";
 
 interface CartItem {
   id: string;
@@ -194,6 +195,7 @@ const Checkout = () => {
           {isProcessing ? "Processing..." : "Place Order"}
         </Button>
       </main>
+      <Footer />
     </div>
   );
 };
