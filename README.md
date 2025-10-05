@@ -1,73 +1,174 @@
-# Welcome to your Lovable project
+## Kenya‑Mart
 
-## Project info
+A modern, mobile‑first e‑commerce web app for electronics and accessories in Kenya. Built with React + TypeScript, Vite, Tailwind CSS, shadcn/ui, and Supabase for authentication, data and realtime.
 
-**URL**: https://lovable.dev/projects/c0da8211-ff0c-4f97-b17f-e4a034ceb238
+Repository: https://github.com/CodeWithEugene/Kenya-Mart
 
-## How can I edit this code?
+### Features
 
-There are several ways of editing your application.
+- Customer‑facing storefront with product listing, detail pages, and cart/checkout
+- Secure authentication (email/password) via Supabase Auth
+- Shopping cart with real‑time badge updates in the navbar
+  - Same‑tab updates via `cart-updated` window event
+  - Cross‑tab/device updates via Supabase Realtime on `cart_items`
+- Order placement flow with order confirmation and order history
+- Responsive UI built with Tailwind CSS and shadcn/ui components
+- Client‑side routing with React Router v6
+- Production‑ready Vercel config (SPA rewrites for deep links/refresh)
 
-**Use Lovable**
+### Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/c0da8211-ff0c-4f97-b17f-e4a034ceb238) and start prompting.
+- React 18 + TypeScript
+- Vite 5
+- Tailwind CSS + shadcn/ui (Radix primitives)
+- Supabase (Postgres, Auth, Realtime, JS client)
+- React Router v6
 
-Changes made via Lovable will be committed automatically to this repo.
+### Project Structure
 
-**Use your preferred IDE**
+```
+src/
+  components/
+    Navbar.tsx
+    ProductCard.tsx
+    Footer.tsx
+    ui/*                 # shadcn/ui generated primitives
+  hooks/
+  integrations/
+    supabase/
+      client.ts         # Supabase client initialization
+      types.ts
+  pages/
+    Index.tsx           # Home/landing
+    Products.tsx        # Catalog
+    ProductDetail.tsx   # PDP with Add to Cart
+    Cart.tsx            # Cart & quantity management
+    Checkout.tsx        # Place order
+    OrderConfirmation.tsx
+    Orders.tsx          # Order history
+    Auth.tsx            # Sign in / Sign up
+    NotFound.tsx
+```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Getting Started
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+#### Prerequisites
 
-Follow these steps:
+- Node.js 18+
+- A Supabase project (URL + anon key)
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+#### Install
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+```bash
+npm install
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+#### Environment
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+Create `.env` (or `.env.local`) at the project root with your Supabase credentials:
+
+```bash
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+The client reads these from `import.meta.env` in `src/integrations/supabase/client.ts`.
+
+#### Run Dev Server
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+- App runs at http://localhost:5173 by default
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+#### Build
 
-**Use GitHub Codespaces**
+```bash
+npm run build
+npm run preview
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Database Schema (Supabase)
 
-## What technologies are used for this project?
+The app expects the following core tables (simplified):
 
-This project is built with:
+- `products` (
+  `id` uuid primary key,
+  `name` text,
+  `description` text,
+  `price` numeric,
+  `image_url` text,
+  `stock` integer,
+  `category` text,
+  `created_at` timestamptz default now()
+)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- `cart_items` (
+  `id` uuid primary key,
+  `user_id` uuid references `auth.users` (user),
+  `product_id` uuid references `products`(id),
+  `quantity` integer
+)
 
-## How can I deploy this project?
+- `orders` (
+  `id` uuid primary key,
+  `user_id` uuid references `auth.users` (user),
+  `total_amount` numeric,
+  `status` text, -- e.g. pending/confirmed/delivered
+  `created_at` timestamptz default now()
+)
 
-Simply open [Lovable](https://lovable.dev/projects/c0da8211-ff0c-4f97-b17f-e4a034ceb238) and click on Share -> Publish.
+- `order_items` (
+  `id` uuid primary key,
+  `order_id` uuid references `orders`(id),
+  `product_id` uuid references `products`(id),
+  `quantity` integer,
+  `price` numeric
+)
 
-## Can I connect a custom domain to my Lovable project?
+You can adapt your actual schema or run migrations from `supabase/migrations` if provided.
 
-Yes, you can!
+#### Realtime
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+The navbar subscribes to Supabase Realtime on `cart_items` filtered by the signed‑in `user_id`, and also listens for a window `cart-updated` event fired by add‑to‑cart flows. Ensure Realtime is enabled for your project and table.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Deployment
+
+#### Vercel
+
+This is a Single Page Application (SPA) built with React Router. To support deep links and refreshes in production, a rewrite is included:
+
+```json
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/" }
+  ]
+}
+```
+
+- Commit `vercel.json` at the repository root (already included here)
+- Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as Environment Variables in Vercel
+- Deploy
+
+### Key UX Notes
+
+- The cart button badge in the navbar reflects the total quantity across all cart items for the current user.
+- Adding/removing items dispatches `window.dispatchEvent(new Event("cart-updated"))` for instant same‑tab updates.
+- Cross‑tab/device updates rely on Supabase Realtime.
+
+### Scripts
+
+- `npm run dev` – start the dev server
+- `npm run build` – build for production
+- `npm run preview` – preview the production build locally
+- `npm run lint` – run eslint
+
+### Contributing
+
+Issues and pull requests are welcome. Please open an issue to discuss substantial changes before submitting a PR.
+
+### License
+
+MIT © Eugenius
+
